@@ -21,7 +21,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Callable, Iterable, Iterator, Sequence
 
-from ..core.models import FileRecord, Finding, Remediation, Severity
+from ..core.models import FileRecord, Finding, Remediation, Severity, scrub
 
 # --------------------------------------------------------------------------
 # Registry
