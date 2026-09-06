@@ -15,6 +15,7 @@ results cacheable and diffable.
 from __future__ import annotations
 
 import concurrent.futures
+import re
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -29,6 +30,35 @@ from .cache import ScanCache
 from .scoring import compute_score
 
 VERSION = "1.0.0"
+
+# NOTE: the body of _parse_suppression was lost in recovery — only its call
+# site survived. Reconstructed from the syntax documented in README.md and the
+# contract of _apply_suppressions below. Behaviour is pinned by TestSuppression
+# in tests/test_pyrasec.py.
+_SUPPRESSION_RE = re.compile(
+    r"pyrasec:ignore(?P<scope>-next-line|-file)?"
+    r"(?P<ids>(?:[ \t,]+[A-Z][A-Z0-9]*[0-9]{3})+)"
+)
+_RULE_ID_RE = re.compile(r"[A-Z][A-Z0-9]*[0-9]{3}")
+_SCOPE_KIND = {None: "line", "-next-line": "next", "-file": "file"}
+
+
+def _parse_suppression(line: str) -> tuple[str, set[str]] | None:
+    """Read one line for a ``pyrasec:ignore`` marker.
+
+    Returns ``(kind, rule_ids)`` where kind is ``"line"``, ``"next"`` or
+    ``"file"``, or ``None`` when the line carries no usable marker.
+
+    A bare ``# pyrasec:ignore`` carrying no rule id returns None deliberately:
+    a blanket suppression is how a scanner quietly stops working.
+    """
+    match = _SUPPRESSION_RE.search(line)
+    if match is None:
+        return None
+    rule_ids = set(_RULE_ID_RE.findall(match.group("ids")))
+    if not rule_ids:
+        return None
+    return _SCOPE_KIND[match.group("scope")], rule_ids
 
 
 class Scanner:

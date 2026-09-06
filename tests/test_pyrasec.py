@@ -22,7 +22,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from pyrasec import Severity, build_folder_tree, build_pyramid, scan  # noqa: E402
-from pyrasec.engine.scanner import Scanner, collect_sbom  # noqa: E402
+from pyrasec.engine.scanner import Scanner, _parse_suppression, collect_sbom  # noqa: E402
 from pyrasec.engine.scoring import compute_score, grade_for, prioritise  # noqa: E402
 from pyrasec.report.html import render_html  # noqa: E402
 from pyrasec.report.sarif import build_sarif  # noqa: E402
@@ -333,6 +333,29 @@ class TestSuppression(unittest.TestCase):
         with TempProject({"a.py": content}) as root:
             found = rule_ids(scan(root, use_cache=False))
         self.assertIn("SEC001", found, "a wildcard suppression must not work")
+
+    def test_every_listed_rule_id_is_parsed(self):
+        """A comma-separated list must suppress *every* id in it, with or
+        without a space after the comma. Parsing only the first id silently
+        ignores half of what the author wrote."""
+        for line in (
+            "# pyrasec:ignore SEC001,SEC002",
+            "# pyrasec:ignore SEC001, SEC002",
+        ):
+            self.assertEqual(
+                _parse_suppression(line), ("line", {"SEC001", "SEC002"}), line
+            )
+
+    def test_suppression_scopes(self):
+        self.assertEqual(
+            _parse_suppression("# pyrasec:ignore-next-line SEC001"),
+            ("next", {"SEC001"}),
+        )
+        self.assertEqual(
+            _parse_suppression("# pyrasec:ignore-file SEC004"),
+            ("file", {"SEC004"}),
+        )
+        self.assertIsNone(_parse_suppression("# pyrasec:ignore"))
 
 
 class TestRobustness(unittest.TestCase):
