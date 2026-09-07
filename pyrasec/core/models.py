@@ -10,9 +10,10 @@ from __future__ import annotations
 
 import hashlib
 import re
-from dataclasses import dataclass, field, asdict
+from collections.abc import Iterable
+from dataclasses import asdict, dataclass, field
 from enum import Enum
-from typing import Any, Iterable
+from typing import Any
 
 
 class Severity(str, Enum):
@@ -52,7 +53,7 @@ class Severity(str, Enum):
         return _SEVERITY_CVSS[self]
 
     @classmethod
-    def worst(cls, severities: Iterable["Severity"]) -> "Severity":
+    def worst(cls, severities: Iterable[Severity]) -> Severity:
         items = list(severities)
         if not items:
             return cls.INFO
@@ -324,7 +325,7 @@ def scrub(text: str) -> str:
     if not text:
         return text
 
-    def _mask_assignment(match: "re.Match[str]") -> str:
+    def _mask_assignment(match: re.Match[str]) -> str:
         value = match.group("value")
         if _ALREADY_MASKED.search(value):
             return match.group(0)

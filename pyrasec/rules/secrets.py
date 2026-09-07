@@ -44,9 +44,9 @@ PLACEHOLDER_PATTERNS = [
     re.compile(r"^<.*>$"),              # <your-key>
     re.compile(r"^%[A-Za-z_]+%$"),      # %WINDOWS_VAR%
     re.compile(r"^\$[A-Z_][A-Z0-9_]*$"),  # $ENV_VAR
-    re.compile(r"^os\.environ", re.I),
-    re.compile(r"^process\.env", re.I),
-    re.compile(r"^(x{6,}|\*{6,}|\.{6,}|-{6,}|0{6,})$", re.I),
+    re.compile(r"^os\.environ", re.IGNORECASE),
+    re.compile(r"^process\.env", re.IGNORECASE),
+    re.compile(r"^(x{6,}|\*{6,}|\.{6,}|-{6,}|0{6,})$", re.IGNORECASE),
 ]
 
 BASE64_CHARS = set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=")

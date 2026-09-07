@@ -18,7 +18,7 @@ import json
 import os
 from typing import Any
 
-from ..core.models import Finding, FileRecord, Remediation, Severity
+from ..core.models import FileRecord, Finding, Remediation, Severity
 from ..rules.base import all_rules
 
 CACHE_VERSION = 2

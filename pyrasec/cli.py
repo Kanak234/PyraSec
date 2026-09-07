@@ -22,7 +22,7 @@ from pathlib import Path
 
 from .core.models import Severity
 from .core.walker import WalkConfig
-from .engine.scanner import Scanner, collect_sbom, VERSION
+from .engine.scanner import VERSION, Scanner, collect_sbom
 from .engine.scoring import compute_score, prioritise
 from .report.html import render_html
 from .report.sarif import build_sarif
@@ -161,7 +161,12 @@ def cmd_sbom(args: argparse.Namespace) -> int:
 
 
 def cmd_pyramid(args: argparse.Namespace) -> int:
-    from .viz.pyramid import build_attack_surface, build_folder_tree, build_pyramid, build_risk_heatmap
+    from .viz.pyramid import (
+        build_attack_surface,
+        build_folder_tree,
+        build_pyramid,
+        build_risk_heatmap,
+    )
 
     result = Scanner(args.path, profile=args.profile).scan()
     payload = {
@@ -200,8 +205,8 @@ def cmd_rules(args: argparse.Namespace) -> int:
         if tag != current_tag:
             print(paint(f"  {tag.upper()}", "grey"))
             current_tag = tag
-        severity = paint("{:<9}".format(rule.severity.value.upper()), "bold")
-        print("  {:<16} {} {}".format(rule.id, severity, rule.title))
+        severity = paint(f"{rule.severity.value.upper():<9}", "bold")
+        print(f"  {rule.id:<16} {severity} {rule.title}")
     print()
     return 0
 
@@ -215,7 +220,7 @@ def cmd_hook(args: argparse.Namespace) -> int:
         return 2
 
     hook = hooks / "pre-commit"
-    script = f"""#!/bin/sh
+    script = """#!/bin/sh
 # Installed by PyraSec. Blocks a commit that introduces high or critical findings.
 # Bypass deliberately (and rarely) with: git commit --no-verify
 exec python3 -m pyrasec scan . --profile fast --fail-on high --format table
@@ -271,7 +276,7 @@ def _table(result, breakdown, verbose: bool) -> str:
     for finding in result.sorted_findings():
         color = SEVERITY_COLOR[finding.severity.value]
         location = f"{finding.path}:{finding.line}" if finding.line else finding.path
-        badge = paint(f" {finding.severity.value.upper():<8} ", "bold")
+        badge = paint(f" {finding.severity.value.upper():<8} ", color, "bold")
         lines.append(f"  {badge} {paint(finding.rule_id, 'grey')}  {finding.title}")
         lines.append(f"     {paint(location, 'cyan')}")
         if finding.evidence:
