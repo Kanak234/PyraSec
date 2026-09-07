@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import json
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from ..core.models import FileRecord, Remediation, Severity
 from .base import ContentRule, iter_lines, register
@@ -205,7 +205,7 @@ def _check_manifest(record: FileRecord, text: str):
         )
 
     for line_no, raw in iter_lines(text):
-        if re.search(r"http://[a-z0-9.-]+/(?:simple|registry|packages)", raw, re.I):
+        if re.search(r"http://[a-z0-9.-]+/(?:simple|registry|packages)", raw, re.IGNORECASE):
             yield INSECURE_REGISTRY_RULE.finding(
                 record.path, line=line_no, evidence=raw.strip()[:120]
             )

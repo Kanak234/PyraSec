@@ -18,8 +18,8 @@ whole reason findings can be cached, diffed and merge-blocked on.
 
 from __future__ import annotations
 
+from collections.abc import Callable, Iterable, Iterator, Sequence
 from dataclasses import dataclass, field
-from typing import Callable, Iterable, Iterator, Sequence
 
 from ..core.models import FileRecord, Finding, Remediation, Severity, scrub
 
@@ -27,21 +27,21 @@ from ..core.models import FileRecord, Finding, Remediation, Severity, scrub
 # Registry
 # --------------------------------------------------------------------------
 
-_REGISTRY: dict[str, "Rule"] = {}
+_REGISTRY: dict[str, Rule] = {}
 
 
-def register(rule: "Rule") -> "Rule":
+def register(rule: Rule) -> Rule:
     if rule.id in _REGISTRY:
         raise ValueError(f"duplicate rule id: {rule.id}")
     _REGISTRY[rule.id] = rule
     return rule
 
 
-def all_rules() -> list["Rule"]:
+def all_rules() -> list[Rule]:
     return sorted(_REGISTRY.values(), key=lambda r: r.id)
 
 
-def get_rule(rule_id: str) -> "Rule | None":
+def get_rule(rule_id: str) -> Rule | None:
     return _REGISTRY.get(rule_id)
 
 
@@ -49,7 +49,7 @@ def rules_for_profile(
     profile: str = "default",
     enabled: Sequence[str] | None = None,
     disabled: Sequence[str] | None = None,
-) -> list["Rule"]:
+) -> list[Rule]:
     """Filter the registry.
 
     Profiles let a pre-commit hook run the fast subset while the nightly scan

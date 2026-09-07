@@ -13,7 +13,6 @@ from __future__ import annotations
 import json
 import os
 import shutil
-import stat
 import sys
 import tempfile
 import unittest
@@ -21,14 +20,21 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from pyrasec import Severity, build_folder_tree, build_pyramid, scan  # noqa: E402
-from pyrasec.engine.scanner import Scanner, _parse_suppression, collect_sbom  # noqa: E402
-from pyrasec.engine.scoring import compute_score, grade_for, prioritise  # noqa: E402
-from pyrasec.report.html import render_html  # noqa: E402
-from pyrasec.report.sarif import build_sarif  # noqa: E402
-from pyrasec.rules.base import all_rules  # noqa: E402
-from pyrasec.rules.secrets import (  # noqa: E402
-    is_high_entropy, looks_like_placeholder, luhn_valid, shannon_entropy,
+from pyrasec import Severity, build_folder_tree, build_pyramid, scan
+from pyrasec.engine.scanner import (
+    Scanner,
+    _parse_suppression,
+    collect_sbom,
+)
+from pyrasec.engine.scoring import compute_score, grade_for, prioritise
+from pyrasec.report.html import render_html
+from pyrasec.report.sarif import build_sarif
+from pyrasec.rules.base import all_rules
+from pyrasec.rules.secrets import (
+    is_high_entropy,
+    looks_like_placeholder,
+    luhn_valid,
+    shannon_entropy,
 )
 
 

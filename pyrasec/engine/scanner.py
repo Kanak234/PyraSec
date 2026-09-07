@@ -24,7 +24,13 @@ from ..core.models import FileRecord, Finding, ScanResult, ScanStats
 from ..core.walker import WalkConfig, Walker, read_text
 from ..rules import base as rulebase
 from ..rules import (  # noqa: F401  (import registers the rules)
-    containers, dependencies, filesystem, gitops, iac, secrets, webserver,
+    containers,
+    dependencies,
+    filesystem,
+    gitops,
+    iac,
+    secrets,
+    webserver,
 )
 from .cache import ScanCache
 from .scoring import compute_score

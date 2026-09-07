@@ -41,13 +41,16 @@ except ImportError as exc:  # pragma: no cover
     ) from exc
 
 from .core.walker import WalkConfig
-from .engine.scanner import Scanner, collect_sbom, VERSION
+from .engine.scanner import VERSION, Scanner, collect_sbom
 from .engine.scoring import compute_score, prioritise
 from .report.html import render_html
 from .report.sarif import build_sarif
 from .rules.base import all_rules
 from .viz.pyramid import (
-    build_attack_surface, build_folder_tree, build_pyramid, build_risk_heatmap,
+    build_attack_surface,
+    build_folder_tree,
+    build_pyramid,
+    build_risk_heatmap,
 )
 
 # Every scan target must resolve inside one of these. Override with

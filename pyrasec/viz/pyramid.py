@@ -19,7 +19,7 @@ and the same structure feeds the treemap, sunburst and folder-tree views.
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 
 from ..core.models import FileRecord, Finding, ScanResult, Severity
 
