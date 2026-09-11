@@ -1,24 +1,62 @@
 name: CI
+
 on:
   push:
+    branches: [ master, prod-hardening ]
   pull_request:
+    branches: [ master ]
+
+permissions:
+  contents: read
+
 jobs:
   test:
+    name: Test, Lint & Coverage (${{ matrix.python-version }})
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: ["3.11", "3.12"]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install
+
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest ruff
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      - name: Lint
+          pip install pytest pytest-cov ruff "fastapi[standard]" httpx .
+
+      - name: Lint with ruff
         run: ruff check .
-      - name: Test
-        run: pytest -q
+
+      - name: Run tests with coverage (>=80%)
+        run: pytest --cov=pyrasec --cov-report=term-missing --cov-fail-under=80 -v
+
+      - name: Verify engine health check
+        run: python -m pyrasec health
+
+  container:
+    name: Container Build & Healthcheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build container image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          load: true
+          tags: pyrasec:test
+
+      - name: Verify container healthcheck and version smoke test
+        run: |
+          docker run --rm pyrasec:test health
+          docker run --rm pyrasec:test --help

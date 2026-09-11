@@ -235,6 +235,22 @@ exec python3 -m pyrasec scan . --profile fast --fail-on high --format table
     return 0
 
 
+def cmd_health(args: argparse.Namespace) -> int:
+    rules = all_rules()
+    info = {
+        "status": "healthy",
+        "engine": "pyrasec",
+        "version": VERSION,
+        "rules_loaded": len(rules),
+    }
+    if getattr(args, "json", False):
+        print(json.dumps(info, indent=2))
+    else:
+        print(json.dumps(info))
+    return 0
+
+
+
 # --------------------------------------------------------------------------
 # Output formats
 # --------------------------------------------------------------------------
@@ -386,10 +402,15 @@ def build_parser() -> argparse.ArgumentParser:
     rules.add_argument("--json", action="store_true")
     rules.set_defaults(func=cmd_rules)
 
+    health = sub.add_parser("health", help="check engine self-health and rule availability")
+    health.add_argument("--json", action="store_true")
+    health.set_defaults(func=cmd_health)
+
     hook = sub.add_parser("hook", help="install the git pre-commit hook")
     hook.add_argument("path", nargs="?", default=".")
     hook.add_argument("--force", action="store_true")
     hook.set_defaults(func=cmd_hook)
+
 
     return parser
 

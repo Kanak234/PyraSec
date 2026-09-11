@@ -15,3 +15,9 @@ build/
 *.gguf
 *.pt
 *.safetensors
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
