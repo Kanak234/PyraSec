@@ -1,6 +1,11 @@
 # PyraSec
 
+[![CI](https://github.com/Kanak234/PyraSec/actions/workflows/ci.yml/badge.svg)](https://github.com/Kanak234/PyraSec/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/Kanak234/PyraSec/actions/workflows/codeql.yml/badge.svg)](https://github.com/Kanak234/PyraSec/actions/workflows/codeql.yml)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+
 **Visualize. Detect. Secure.**
+
 
 A project security scanner that walks your file architecture, applies deterministic rules, renders the result as a 3D pyramid, and tells you exactly what to fix — in that order.
 
