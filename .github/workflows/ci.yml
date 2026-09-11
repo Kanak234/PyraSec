@@ -28,16 +28,17 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest pytest-cov ruff "fastapi[standard]" httpx .
+          pip install pytest pytest-cov ruff "fastapi[standard]" httpx -e .
 
       - name: Lint with ruff
         run: ruff check .
 
       - name: Run tests with coverage (>=80%)
-        run: pytest --cov=pyrasec --cov-report=term-missing --cov-fail-under=80 -v
+        run: python -m pytest --cov=pyrasec --cov-report=term-missing --cov-fail-under=80 -v
 
       - name: Verify engine health check
         run: python -m pyrasec health
+
 
   container:
     name: Container Build & Healthcheck
