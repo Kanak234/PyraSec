@@ -335,6 +335,6 @@ function deco(slide, spots) {
     s.addNotes("Close with the mission line. Q&A. Demo available on request.");
   }
 
-  await pptx.writeFile({ fileName: "/home/claude/pyrasec/PyraSec_HackLabify_Pitch.pptx" });
+  await pptx.writeFile({ fileName: "PyraSec_HackLabify_Pitch.pptx" });
   console.log("deck written");
 })().catch((e) => { console.error(e); process.exit(1); });
