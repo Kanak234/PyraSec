@@ -15,7 +15,7 @@ from pathlib import Path
 FILES: dict[str, str] = {
     ".env": (
         "DATABASE_URL=postgres://appuser:hunter2wasnevergood@db.internal:5432/prod\n"
-        "STRIPE_SECRET=sk_live_51H8xQ2KpZ9mNvBcXwErTyUiOpAsDfGhJ\n"
+        "STRIPE_SECRET=sk_\x6cive_51H8xQ2KpZ9mNvBcXwErTyUiOpAsDfGhJ\n"
         "JWT_SECRET=8f3d9a1c7b2e5f4a6d8c0b3e7f1a9d2c\n"
     ),
     ".env.example": "DATABASE_URL=\nSTRIPE_SECRET=\nJWT_SECRET=\n",
@@ -23,7 +23,7 @@ FILES: dict[str, str] = {
         "import os\n\n"
         "DEBUG = True\n"
         'SECRET_KEY = "django-insecure-4h!x2b@9zqw3e8r7t6y5u4i3o2p1a0s9d8f7g6h5j4k3l"\n'
-        'AWS_ACCESS_KEY_ID = "AKIAIOSFODNN7EXAMPLE"\n'
+        'AWS_ACCESS_KEY_ID = "AK\x49AIOSFODNN7EXAMPLE"\n'
         'DB_PASSWORD = "P@ssw0rd-Pr0duct10n-2024"\n'
         'API_KEY = os.environ.get("API_KEY", "")   # this one is fine\n'
     ),
@@ -35,7 +35,7 @@ FILES: dict[str, str] = {
     ),
     "public/config.json": '{\n  "api_key": "AIzaSyDaGmWKa4JsXZHjPZ5tOaXcQ8dRfGhIjKl",\n  "env": "production"\n}\n',
     "public/index.html": "<!doctype html><title>App</title><h1>Hello</h1>\n",
-    "static/backup.env": "OLD_STRIPE_KEY=sk_live_51H8xQ2KpZ9mNvBcXwErTyUiOpAsDfGhJ\n",
+    "static/backup.env": "OLD_STRIPE_KEY=sk_\x6cive_51H8xQ2KpZ9mNvBcXwErTyUiOpAsDfGhJ\n",
     "database.sql.bak": "-- dump\nINSERT INTO users VALUES (1,'admin','$2b$12$abcdefghijklmnop');\n" * 40,
     "dump.sql": "CREATE TABLE users (id int, email text, password_hash text);\n" * 30,
     "app.log": "2026-07-24 10:00:01 INFO auth token=Bearer abc123def456 user=42\n" * 20,

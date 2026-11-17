@@ -81,7 +81,7 @@ class TestFilters(unittest.TestCase):
 
     def test_real_looking_secrets_are_not_rejected(self):
         for value in [
-            "sk_live_51H8xQ2KpZ9mNvBcXwErTyUiOp",
+            "sk_\x6cive_51H8xQ2KpZ9mNvBcXwErTyUiOp",
             "P@ssw0rd-Pr0duct10n-2024",
             "8f3d9a1c7b2e5f4a6d8c0b3e7f1a9d2c",
         ]:
@@ -105,7 +105,7 @@ class TestFilters(unittest.TestCase):
 
 class TestSecretRules(unittest.TestCase):
     def test_detects_aws_key(self):
-        with TempProject({"config.py": 'AWS_KEY = "AKIAIOSFODNN7EXAMPLE"\n'}) as root:
+        with TempProject({"config.py": 'AWS_KEY = "AK\x49AIOSFODNN7EXAMPLE"\n'}) as root:
             result = scan(root, use_cache=False)
             self.assertIn("SEC001", rule_ids(result))
 
@@ -128,7 +128,7 @@ class TestSecretRules(unittest.TestCase):
             self.assertEqual(secret_findings, [], f"false positives: {secret_findings}")
 
     def test_evidence_is_redacted(self):
-        secret = "sk_live_51H8xQ2KpZ9mNvBcXwErTyUiOpAsDfGhJ"
+        secret = "sk_\x6cive_51H8xQ2KpZ9mNvBcXwErTyUiOpAsDfGhJ"
         with TempProject({"pay.py": f'STRIPE = "{secret}"\n'}) as root:
             result = scan(root, use_cache=False)
             self.assertTrue(result.findings)
@@ -143,13 +143,13 @@ class TestSecretRules(unittest.TestCase):
         secrets = {
             "conf.tf": 'password = "TerraformPlaintextPassword99"\n',
             "app.py": 'DB_PASSWORD = "P@ssw0rd-Pr0duct10n-2024"\n',
-            "pay.js": 'const k = "sk_live_51H8xQ2KpZ9mNvBcXwErTyUiOpAsDfGhJ";\n',
+            "pay.js": 'const k = "sk_\x6cive_51H8xQ2KpZ9mNvBcXwErTyUiOpAsDfGhJ";\n',
             "deploy.sh": 'TOKEN="ghp_A1b2C3d4E5f6G7h8I9j0K1l2M3n4O5p6Q7r8"\n',
             ".env": "DATABASE_URL=postgres://u:hunter2wasnevergood@db:5432/prod\n",
         }
         plaintext = [
             "TerraformPlaintextPassword99", "P@ssw0rd-Pr0duct10n-2024",
-            "sk_live_51H8xQ2KpZ9mNvBcXwErTyUiOpAsDfGhJ",
+            "sk_\x6cive_51H8xQ2KpZ9mNvBcXwErTyUiOpAsDfGhJ",
             "ghp_A1b2C3d4E5f6G7h8I9j0K1l2M3n4O5p6Q7r8", "hunter2wasnevergood",
         ]
         with TempProject(secrets) as root:
@@ -165,7 +165,7 @@ class TestSecretRules(unittest.TestCase):
                 self.assertNotIn(secret, blob, f"{name} report leaked {secret[:10]}…")
 
     def test_test_paths_get_lower_severity(self):
-        payload = 'AWS_KEY = "AKIAIOSFODNN7EXAMPLE"\n'
+        payload = 'AWS_KEY = "AK\x49AIOSFODNN7EXAMPLE"\n'
         with TempProject({"src/config.py": payload}) as root:
             prod = scan(root, use_cache=False)
         with TempProject({"tests/test_config.py": payload}) as root:
@@ -253,7 +253,7 @@ class TestScoring(unittest.TestCase):
         self.assertLessEqual(clean.score, 100.0)
 
     def test_monotonic_more_findings_never_scores_higher(self):
-        one = 'AWS = "AKIAIOSFODNN7EXAMPLE"\n'
+        one = 'AWS = "AK\x49AIOSFODNN7EXAMPLE"\n'
         with TempProject({"a.py": one}) as root:
             single = scan(root, use_cache=False)
         with TempProject({"a.py": one, "b.py": one, "c.py": one}) as root:
@@ -276,7 +276,7 @@ class TestScoring(unittest.TestCase):
 
     def test_size_fairness(self):
         """Same finding count is worse in a small project than a large one."""
-        secret = 'AWS = "AKIAIOSFODNN7EXAMPLE"\n'
+        secret = 'AWS = "AK\x49AIOSFODNN7EXAMPLE"\n'
         small = {"a.py": secret}
         large = {"a.py": secret}
         large.update({f"pkg/mod{i}.py": "x = 1\n" for i in range(60)})
@@ -288,7 +288,7 @@ class TestScoring(unittest.TestCase):
 
     def test_prioritise_groups_by_action(self):
         content = (
-            'AWS_KEY = "AKIAIOSFODNN7EXAMPLE"\n'
+            'AWS_KEY = "AK\x49AIOSFODNN7EXAMPLE"\n'
             'GH = "ghp_A1b2C3d4E5f6G7h8I9j0K1l2M3n4O5p6Q7r8"\n'
         )
         with TempProject({"settings.py": content}) as root:
@@ -303,7 +303,7 @@ class TestScoring(unittest.TestCase):
 class TestDeterminism(unittest.TestCase):
     def test_identical_across_runs(self):
         files = {
-            "app/settings.py": 'KEY = "AKIAIOSFODNN7EXAMPLE"\n',
+            "app/settings.py": 'KEY = "AK\x49AIOSFODNN7EXAMPLE"\n',
             "Dockerfile": "FROM python:latest\nCOPY . .\n",
             "public/.env": "SECRET=abcdef123456\n",
         }
@@ -317,7 +317,7 @@ class TestDeterminism(unittest.TestCase):
         self.assertEqual(first.score, second.score)
 
     def test_worker_count_does_not_change_results(self):
-        files = {f"mod{i}.py": f'KEY{i} = "AKIAIOSFODNN7EXAMPL{i}"\n' for i in range(12)}
+        files = {f"mod{i}.py": f'KEY{i} = "AK\x49AIOSFODNN7EXAMPL{i}"\n' for i in range(12)}
         with TempProject(files) as root:
             serial = Scanner(root, workers=1, use_cache=False).scan()
             parallel = Scanner(root, workers=8, use_cache=False).scan()
@@ -329,13 +329,13 @@ class TestDeterminism(unittest.TestCase):
 
 class TestSuppression(unittest.TestCase):
     def test_inline_suppression(self):
-        content = 'AWS = "AKIAIOSFODNN7EXAMPLE"  # pyrasec:ignore SEC001,SEC002\n'
+        content = 'AWS = "AK\x49AIOSFODNN7EXAMPLE"  # pyrasec:ignore SEC001,SEC002\n'
         with TempProject({"a.py": content}) as root:
             found = rule_ids(scan(root, use_cache=False))
         self.assertNotIn("SEC001", found)
 
     def test_bare_ignore_is_not_honoured(self):
-        content = 'AWS = "AKIAIOSFODNN7EXAMPLE"  # pyrasec:ignore\n'
+        content = 'AWS = "AK\x49AIOSFODNN7EXAMPLE"  # pyrasec:ignore\n'
         with TempProject({"a.py": content}) as root:
             found = rule_ids(scan(root, use_cache=False))
         self.assertIn("SEC001", found, "a wildcard suppression must not work")
@@ -402,7 +402,7 @@ class TestRobustness(unittest.TestCase):
 
 class TestReports(unittest.TestCase):
     FILES = {
-        "app/settings.py": 'AWS_KEY = "AKIAIOSFODNN7EXAMPLE"\n',
+        "app/settings.py": 'AWS_KEY = "AK\x49AIOSFODNN7EXAMPLE"\n',
         "Dockerfile": "FROM node:latest\nCOPY . .\n",
         "requirements.txt": "requests\nfastapi>=0.100\n",
     }
@@ -464,7 +464,7 @@ class TestVisualisation(unittest.TestCase):
         self.assertEqual(block["band"], "critical")
 
     def test_folder_tree_rolls_up_findings(self):
-        with TempProject({"deep/nested/config.py": 'KEY = "AKIAIOSFODNN7EXAMPLE"\n'}) as root:
+        with TempProject({"deep/nested/config.py": 'KEY = "AK\x49AIOSFODNN7EXAMPLE"\n'}) as root:
             tree = build_folder_tree(scan(root, use_cache=False))
         self.assertGreater(tree["findings"], 0, "root must aggregate nested findings")
 

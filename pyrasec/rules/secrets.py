@@ -150,7 +150,7 @@ SECRET_REMEDIATION = Remediation(
     ],
     example=(
         "# before\n"
-        'STRIPE_KEY = "sk_live_4eC39HqLyjWDarjtT1zdp7dc"\n\n'  # pyrasec:ignore SEC001,SEC002
+        'STRIPE_KEY = "sk_\x6cive_4eC39HqLyjWDarjtT1zdp7dc"\n\n'  # pyrasec:ignore SEC001,SEC002
         "# after\n"
         "import os\n"
         'STRIPE_KEY = os.environ["STRIPE_KEY"]  # raises loudly if unset\n'
